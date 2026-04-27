@@ -1,28 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getPrisma } from "@/lib/db";
-import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
-import { setAccessTokenCookie, setRefreshTokenCookie } from "@/lib/cookies";
-import { createAuditLog } from "@/lib/audit";
-import type { ApiResponse } from "@/types";
+import { prisma } from "@/lib/db/prisma";
+import { signAccessToken, signRefreshToken, type UserRole } from "@/lib/jwt";
+import { setAccessTokenCookie, setRefreshTokenCookie } from "@/lib/cookies"
+
+type ApiResponse = {
+    success: boolean;
+    message: string;
+    data?: unknown;
+    errors?: Array<{ field: string; message: string }>;
+};
 
 export async function POST(req: NextRequest) {
     try {
-        const prisma = getPrisma();
-        const { email, password } = await req.json();
-        const fieldErrors: Array<{ field: string; message: string }> = [];
+        const body = await req.json();
+        const email = body.email as string;
+        const password = body.password as string;
 
         if (!email || !email.includes("@")) {
-            fieldErrors.push({ field: "email", message: "Email inválido" });
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Email inválido",
+                    errors: [{ field: "email", message: "Email inválido" }],
+                } as ApiResponse,
+                { status: 400 }
+            );
         }
 
         if (!password || password.length < 6) {
-            fieldErrors.push({ field: "password", message: "Contraseña inválida" });
-        }
-
-        if (fieldErrors.length > 0) {
             return NextResponse.json(
-                { success: false, message: "Error de validación", errors: fieldErrors } as ApiResponse,
+                {
+                    success: false,
+                    message: "Contraseña inválida",
+                    errors: [{ field: "password", message: "Contraseña inválida" }],
+                } as ApiResponse,
                 { status: 400 }
             );
         }
@@ -33,71 +45,83 @@ export async function POST(req: NextRequest) {
 
         if (!user) {
             return NextResponse.json(
-                { success: false, message: "Usuario no existe" } as ApiResponse,
+                {
+                    success: false,
+                    message: "Usuario no existe",
+                } as ApiResponse,
                 { status: 404 }
             );
         }
 
         if (user.status !== "ACTIVE") {
             return NextResponse.json(
-                { success: false, message: "Tu cuenta no está activa" } as ApiResponse,
+                {
+                    success: false,
+                    message: "Tu cuenta no está activa",
+                } as ApiResponse,
                 { status: 403 }
             );
         }
 
-        const valid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        if (!valid) {
+        if (!isPasswordValid) {
             return NextResponse.json(
-                { success: false, message: "Contraseña incorrecta" } as ApiResponse,
+                {
+                    success: false,
+                    message: "Contraseña incorrecta",
+                } as ApiResponse,
                 { status: 401 }
             );
         }
 
-        const payload = {
-            userId: user.id,
+        const tokenPayload = {
+            id: user.id,
             email: user.email,
-            role: user.role,
+            role: user.role as UserRole,
         };
 
-        const accessToken = generateAccessToken(payload);
-        const refreshToken = generateRefreshToken(payload);
+        const accessToken = await signAccessToken(tokenPayload);
+        const refreshToken = await signRefreshToken(tokenPayload);
 
-        // Guardar refresh token en DB
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 7);
+
         await prisma.refreshToken.create({
             data: {
                 token: refreshToken,
                 userId: user.id,
-                expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 días
+                expiresAt: expirationDate,
             },
         });
 
         await setAccessTokenCookie(accessToken);
         await setRefreshTokenCookie(refreshToken);
-        await createAuditLog({
-            action: "LOGIN",
-            entity: "auth",
-            userId: user.id,
-            entityId: user.id,
-            newValues: { email: user.email, role: user.role },
-        });
 
-        // Excluir password de la respuesta
-        const { password: removedPassword, ...userWithoutPassword } = user;
-        void removedPassword;
+        const userResponse = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            status: user.status,
+        };
 
         return NextResponse.json(
             {
                 success: true,
                 message: "Login exitoso",
-                data: { user: userWithoutPassword },
+                data: { user: userResponse },
             } as ApiResponse,
             { status: 200 }
         );
     } catch (error) {
-        console.error("[LOGIN]", error);
+        console.error("[LOGIN ERROR]", error);
+
         return NextResponse.json(
-            { success: false, message: "Error interno del servidor" } as ApiResponse,
+            {
+                success: false,
+                message: "Error interno del servidor",
+            } as ApiResponse,
             { status: 500 }
         );
     }

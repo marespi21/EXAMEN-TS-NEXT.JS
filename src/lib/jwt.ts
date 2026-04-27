@@ -14,8 +14,8 @@ const REFRESH_TOKEN_SECRET =
     process.env.JWT_REFRESH_SECRET ?? process.env.JWT_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = "15m";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
-const ACCESS_COOKIE_NAME = "aion_access_token";
-const REFRESH_COOKIE_NAME = "aion_refresh_token";
+export const ACCESS_COOKIE_NAME = "aion_access_token";
+export const REFRESH_COOKIE_NAME = "aion_refresh_token";
 
 function accessSecretKey(): Uint8Array {
     if (!ACCESS_TOKEN_SECRET) {

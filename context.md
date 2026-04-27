@@ -1,0 +1,1 @@
+## 5. Reservas - **CRUD básico:** - CRUD de reservas (fecha, cliente, servicio/producto, estado). - **Reto extra:** - **Calendario interactivo:** - Vista mensual/semanal con reservas. - Validación de disponibilidad (no permitir doble reserva en mismo horario). - **Bonus:** - Exportar reservas a PDF o CSV. revisa lo que tengo en mi proyecto y ajusta estos requerimientos
