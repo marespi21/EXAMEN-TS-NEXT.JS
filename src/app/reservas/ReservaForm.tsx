@@ -7,7 +7,7 @@ import type {
     ReservationConfirmation,
     FormErrors,
 } from "@/lib/db/reservations";
-import { RESTAURANT_ID } from "@/app/api/seed/route";
+import { RESTAURANT_ID } from "@/services/seed";
 
 // Valida los campos del formulario antes de enviar
 function validateForm(form: ReservationFormData): FormErrors {

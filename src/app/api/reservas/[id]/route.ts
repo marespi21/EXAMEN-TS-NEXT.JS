@@ -4,7 +4,7 @@ import {
     getReservationById,
     updateReservationStatus,
     deleteReservation,
-} from "@/lib/db/reservations";
+} from "@/services/reservations";
 
 // Tipo del parámetro dinámico [id] en Next.js App Router
 type RouteParams = { params: Promise<{ id: string }> };

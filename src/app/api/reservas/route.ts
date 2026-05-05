@@ -4,7 +4,7 @@ import {
     createReservation,
     getUserReservations,
     type ReservationFormData,
-} from "@/lib/db/reservations";
+} from "@/services/reservations";
 
 // GET /api/reservas
 // Devuelve todas las reservas del usuario logueado

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAvailableTables } from "@/lib/db/reservations";
+import { getAvailableTables } from "@/services/reservations";
 
 // GET /api/reservas/servicios?restaurantId=...&date=...&time=...&partySize=...
 // Devuelve los servicios disponibles para una fecha, hora y número de personas

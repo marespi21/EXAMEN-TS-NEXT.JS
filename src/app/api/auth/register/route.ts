@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10); // hgjfjhbgky#!@$@#$
 
         const newUser = await prisma.user.create({
             data: {
@@ -87,8 +87,8 @@ export async function POST(req: NextRequest) {
             role: newUser.role as UserRole,
         };
 
-        const accessToken = await signAccessToken(tokenPayload);
-        const refreshToken = await signRefreshToken(tokenPayload);
+        const accessToken = await signAccessToken(tokenPayload);  // my_token 
+        const refreshToken = await signRefreshToken(tokenPayload); // my_refresh_token
 
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 7);

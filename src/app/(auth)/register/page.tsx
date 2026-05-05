@@ -112,9 +112,10 @@ export default function RegisterPage() {
             <section className="mx-auto grid min-h-[calc(100vh-2rem)] w-full max-w-6xl overflow-hidden rounded-[2rem] bg-white shadow-2xl md:min-h-[calc(100vh-4rem)] md:grid-cols-2">
                 <div className="relative h-64 md:h-auto">
                     <Image
-                        src="/images/clockhub-auth.png"
+                        src="/moda-futurista.png"
                         alt="ClockHub ilustración"
                         fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover"
                         priority
                     />

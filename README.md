@@ -1,36 +1,176 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AION Reservas
 
-## Getting Started
+Aplicacion web de reservas para restaurante desarrollada con Next.js, TypeScript y Prisma.
 
-First, run the development server:
+## Objetivo del proyecto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Implementar una solucion funcional para:
+
+- registro e inicio de sesion de usuarios
+- gestion de sesion con JWT (access y refresh token)
+- consulta y creacion de reservas
+- visualizacion de reservas en dashboard y calendario
+
+## Stack tecnologico
+
+- `Next.js 16` (App Router)
+- `TypeScript`
+- `Prisma ORM`
+- `SQLite` para desarrollo local
+- `JWT` con `jose`
+- `bcryptjs` para hash de contraseñas
+
+## Estructura del proyecto
+
+```text
+src/
+  app/
+    (auth)/
+    api/
+      auth/
+      reservas/
+      seed/
+    dashboard/
+    reservas/
+  lib/
+    db/
+    jwt.ts
+    session.ts
+    cookies.ts
+prisma/
+  schema.prisma
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Requisitos previos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `Node.js` 20 o superior
+- `npm` 10 o superior
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configuracion de entorno
 
-## Learn More
+Crear archivo `.env` en la raiz del proyecto:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="dev_jwt_secret_min_32_characters_12345"
+JWT_REFRESH_SECRET="dev_refresh_secret_min_32_chars_67890"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Instalacion y ejecucion local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# 1) Entrar al proyecto
+cd "EXAMEN-TS-NEXT.JS"
 
-## Deploy on Vercel
+# 2) Instalar dependencias
+npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 3) Generar cliente de Prisma
+npx prisma generate
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 4) Crear/sincronizar tablas en SQLite
+npx prisma db push
+
+# 5) Levantar servidor de desarrollo
+npm run dev -- --hostname 127.0.0.1 --port 3001
+```
+
+Abrir en navegador:
+
+- [http://127.0.0.1:3001](http://127.0.0.1:3001)
+
+## Scripts disponibles
+
+- `npm run dev`: inicia el entorno de desarrollo (webpack)
+- `npm run build`: compila para produccion
+- `npm run start`: inicia la build de produccion
+- `npm run lint`: ejecuta linter
+
+## Endpoints principales
+
+### Auth
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/refresh`
+
+### Reservas
+
+- `GET /api/reservas`
+- `POST /api/reservas`
+- `GET /api/reservas/servicios`
+
+### Seed
+
+- `GET /api/seed` (solo desarrollo)
+
+## Validacion funcional sugerida
+
+1. Registrar usuario en `/register`.
+2. Iniciar sesion en `/login`.
+3. Confirmar acceso a `/dashboard`.
+4. Crear reserva en `/reservas`.
+5. Verificar reservas en dashboard/calendario.
+
+## Solucion de errores comunes
+
+### 1) Error `ENOENT: package.json`
+
+Causa: comando ejecutado en carpeta incorrecta.
+
+Solucion:
+
+```bash
+cd "/ruta/al/proyecto/EXAMEN-TS-NEXT.JS"
+```
+
+### 2) Error `P1012` en Prisma (URL invalida para SQLite)
+
+Causa: `DATABASE_URL` no inicia con `file:`.
+
+Solucion:
+
+```env
+DATABASE_URL="file:./dev.db"
+```
+
+### 3) Error `P2021` (tabla no existe)
+
+Causa: base de datos sin sincronizar con el schema.
+
+Solucion:
+
+```bash
+npx prisma db push
+```
+
+### 4) Error `EADDRINUSE` (puerto ocupado)
+
+Solucion: usar otro puerto o liberar el puerto en uso.
+
+```bash
+npm run dev -- --hostname 127.0.0.1 --port 3001
+```
+
+### 5) Error de Turbopack en desarrollo
+
+Solucion aplicada: usar webpack en script `dev`.
+
+## Criterios de calidad aplicados
+
+- separacion por responsabilidades (`app`, `api`, `lib`)
+- validaciones basicas en endpoints
+- manejo de errores y respuestas HTTP coherentes
+- uso de variables de entorno para secretos
+- esquema relacional con restricciones para reservas
+
+## Mejoras futuras
+
+- pruebas unitarias e integracion
+- documentacion de arquitectura con diagramas
+- migracion a Postgres para entorno productivo
+- pipeline CI/CD para build, lint y tests
+
+## Autor
+
+Proyecto academico para prueba de desempeno.

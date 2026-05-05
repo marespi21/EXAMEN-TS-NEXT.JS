@@ -42,11 +42,11 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+              src="/moda-futurista.png"
+              alt="Imagen futurista"
+              width={1024}
+              height={661}
+              className="h-auto w-10 rounded-sm"
             />
             Deploy Now
           </a>

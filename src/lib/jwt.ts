@@ -51,6 +51,7 @@ export async function signRefreshToken(
 
 export async function verifyAccessToken(token: string): Promise<AuthJwtPayload> {
     const verified = await jwtVerify<AuthJwtPayload>(token, accessSecretKey());
+    console.log('INSIDE VERIFY ACCESS TOKEN', verified);
     return verified.payload;
 }
 
